@@ -1,18 +1,16 @@
-import { View, Text, ScrollView, Image, Alert,  } from "react-native"
-import { useState } from "react"
-import { SafeAreaView } from "react-native-safe-area-context"
-import {images} from '../../constants'
-import FormField from '../../components/FormField'
-import CustomButton from '../../components/CustomButton'
-import { Link, router } from "expo-router"
-import { signIn } from "../../lib/appwrite"
+import { View, Text, ScrollView, Image, Alert, ActivityIndicator } from "react-native";
+import { useState } from "react";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { images } from '../../constants';
+import FormField from '../../components/FormField';
+import CustomButton from '../../components/CustomButton';
+import { Link, router } from "expo-router";
+import { signIn } from "../../lib/appwrite";
+import { useGlobalContext } from "../../context/GlobalProvider";
 
 const SignIn = () => {
-  const [form, setForm] = useState({
-    email: '',
-    password: ''
-  });
-
+  const { setUser, setIsLogged } = useGlobalContext();
+  const [form, setForm] = useState({ email: '', password: '' });
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const submit = async () => {
@@ -25,6 +23,8 @@ const SignIn = () => {
 
     try {
       const result = await signIn(form.email, form.password);
+      setUser(result);
+      setIsLogged(true);
       router.replace('/home');
     } catch (error) {
       console.log(error);
@@ -38,11 +38,7 @@ const SignIn = () => {
     <SafeAreaView className="bg-primary h-full">
       <ScrollView>
         <View className='w-full justify-center min-h-[85vh] px-4 my-6'>
-          <Image
-            source={images.logo}
-            resizeMode='contain'
-            className='w-[115px] h-[35px]'
-          />
+          <Image source={images.logo} resizeMode='contain' className='w-[115px] h-[35px]' />
           <Text className='text-2xl text-white font-psemibold mt-10'>Log in to Aora</Text>
           <FormField
             title="Email"
@@ -58,7 +54,7 @@ const SignIn = () => {
             otherStyles="mt-7"
             secureTextEntry
           />
-          <CustomButton 
+          <CustomButton
             title="Sign In"
             handlePress={submit}
             containerStyles='mt-7'
